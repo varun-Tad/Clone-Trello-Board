@@ -9,15 +9,54 @@ import { useState } from "react";
 
 function App() {
   const [CardD, setCardD] = useState(CardData);
+  const [addCardInputData, setAddCardInputData] = useState("");
+  const [addListToggle, setAddListToggle] = useState(true);
+  const [addListInput, setAddListInput] = useState("");
 
   const addCardClickHandler = (DataTitle) => {
     setCardD(
       CardD.map((cardObj) =>
         cardObj.title === DataTitle
-          ? { ...cardObj, addCardDataToggle: !cardObj.addCardDataToggle } // start here
+          ? { ...cardObj, addCardDataToggle: !cardObj.addCardDataToggle }
           : { ...cardObj }
       )
     );
+  };
+
+  const addCardInputChangeHandler = (e) => {
+    setAddCardInputData(e.target.value);
+  };
+
+  const addToCardHandler = (DataTitle) => {
+    setCardD(
+      CardD.map((cardObj) =>
+        cardObj.title === DataTitle
+          ? { ...cardObj, content: [...cardObj.content, addCardInputData] }
+          : { ...cardObj }
+      )
+    );
+
+    setAddCardInputData("");
+  };
+
+  const addListToggleFunc = () => {
+    setAddListToggle(!addListToggle);
+  };
+
+  const addListChangeHandler = (ListInput) => {
+    setAddListInput(ListInput.target.value);
+  };
+
+  const addListClickHandler = () => {
+    setCardD([
+      ...CardD,
+      {
+        title: addListInput,
+        content: [],
+        addCardDataToggle: false,
+      },
+    ]);
+    addListToggleFunc();
   };
 
   return (
@@ -92,8 +131,10 @@ function App() {
                         id="outlined-multiline-static"
                         multiline
                         rows={4}
-                        defaultValue="Enter Content"
+                        value={addCardInputData}
+                        placeholder="Enter Content"
                         sx={{ marginTop: "1.5rem" }}
+                        onChange={(e) => addCardInputChangeHandler(e)}
                       />
                       <Box
                         sx={{
@@ -103,7 +144,12 @@ function App() {
                           gap: "0.4rem",
                         }}
                       >
-                        <Button variant="contained">Add Card</Button>
+                        <Button
+                          variant="contained"
+                          onClick={() => addToCardHandler(data.title)}
+                        >
+                          Add Card
+                        </Button>
                         <CloseIcon
                           onClick={() => addCardClickHandler(data.title)}
                           sx={{ cursor: "pointer" }}
@@ -129,10 +175,50 @@ function App() {
             </Paper>
           </Box>
         ))}
-        <Button sx={{ width: "15rem", height: "2rem" }} variant="contained">
-          <AddIcon />
-          Add List
-        </Button>
+        {addListToggle ? (
+          <Button
+            sx={{ width: "15rem", height: "2rem" }}
+            variant="contained"
+            onClick={() => addListToggleFunc()}
+          >
+            <AddIcon />
+            Add List
+          </Button>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "white",
+              height: "13rem",
+            }}
+          >
+            <TextField
+              id="outlined-multiline-static"
+              multiline
+              rows={4}
+              placeholder="Add List"
+              sx={{ backgroundColor: "white", padding: "1rem" }}
+              value={addListInput}
+              onChange={(e) => addListChangeHandler(e)}
+            />
+            <Box sx={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+              <Button
+                onClick={addListClickHandler}
+                sx={{ width: "10rem" }}
+                variant="contained"
+              >
+                Add List
+              </Button>
+              <CloseIcon
+                onClick={() => addListToggleFunc()}
+                sx={{ cursor: "pointer" }}
+              />
+            </Box>
+          </Box>
+        )}
       </Box>
     </div>
   );
